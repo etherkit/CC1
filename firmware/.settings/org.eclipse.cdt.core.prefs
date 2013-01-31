@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435=
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/delimiter=\:
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/operation=replace
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/value=8000000
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435/append=true
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435/appendContributed=true
