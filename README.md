@@ -1,4 +1,4 @@
 CC1
 ===
 
-CC1 CQ QRP Transceiver
+CC1 CW QRP Transceiver
