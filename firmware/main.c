@@ -144,6 +144,7 @@ enum TUNERATE {TUNE_SLOW, TUNE_FAST};
 enum FREQREG {REG_0, REG_1}; // During incremental tuning, REG_0 is the RX freq, REG_1 is the TX freq
 enum INCTUNE {INC_NONE, INC_RIT, INC_XIT};
 enum VFO {VFO_RX, VFO_TX};
+enum MSGMEM {MSGMEM_1, MSGMEM_2};
 
 // Global variable defs
 uint16_t dit_length;
@@ -154,7 +155,7 @@ enum MODE prev_mode, cur_mode, default_mode;
 char * announce_buffer;
 char * text_buffer;
 static char msg_buffer[MSG_BUFFER_SIZE];
-char menu[] = {'S', 'W', 'R', 'V', 'K', '\0'};
+char menu[] = {'S', 'W', '1', '2', 'V', 'K', '\0'};
 enum TUNERATE tune_rate = TUNE_FAST;
 uint16_t tune_step = DDS_100HZ;
 uint8_t tune_freq_step = 25;
@@ -1124,13 +1125,15 @@ uint8_t i2c_status(void)
 int main(void)
 {
 	//static uint32_t cur_timer = 0;
-	static uint32_t rec_timeout;
+	static uint32_t rec_timeout, rec_space_timeout;
 	static uint8_t cur_character = '\0';
-	static uint8_t rec_input, rec_count;
+	static uint8_t rec_input, rec_count, rec_char_count;
 	static char * cur_char_p;
 	static char * cur_menu_p;
 	static char * cur_menu;
 	static char val_index;
+	static enum BOOL rec_space_last;
+	static enum MSGMEM rec_msg;
 
 	announce_buffer = malloc(ANNOUNCE_BUFFER_SIZE);
 	memset(announce_buffer, '\0', ANNOUNCE_BUFFER_SIZE);
@@ -1142,9 +1145,9 @@ int main(void)
 	init();
 
 	if(cur_mode == MODE_CAL)
-		announce("CAL", st_freq, 20);
+		announce("CAL", st_freq, 22);
 	else
-		announce("CC1", st_freq, 20);
+		announce("CC1", st_freq, 22);
 
 	// Main event loop
 	while(1)
@@ -1628,7 +1631,6 @@ int main(void)
 							cur_state = STATE_IDLE;
 							cur_mode = default_mode;
 
-							//set_st_freq(ST_LOW);
 							announce("X", ST_LOW, wpm);
 						}
 						else
@@ -1659,10 +1661,20 @@ int main(void)
 							announce(text_buffer, st_freq, wpm);
 							break;
 
-						// Record keyer memory
-						case 'R':
+						// Record keyer memory 1
+						case '1':
 							cur_state = STATE_INIT;
 							cur_mode = MODE_RECORD;
+							rec_msg = MSGMEM_1;
+
+							announce("R", ST_HIGH, 22);
+							break;
+
+						// Record keyer memory 2
+						case '2':
+							cur_state = STATE_INIT;
+							cur_mode = MODE_RECORD;
+							rec_msg = MSGMEM_2;
 
 							announce("R", ST_HIGH, 22);
 							break;
@@ -1890,7 +1902,10 @@ int main(void)
 				// Initialize the current recorded character
 				rec_input = 0;
 				rec_count = 0;
+				rec_char_count = 0;
 				rec_timeout = UINT32_MAX;
+				rec_space_timeout = UINT32_MAX;
+				rec_space_last = TRUE;
 
 				strcpy(msg_buffer, "");
 
@@ -1909,7 +1924,7 @@ int main(void)
 
 					// Add this element to the recorded character
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 				// Dah paddle only
@@ -1924,7 +1939,7 @@ int main(void)
 					// Add this element to the recorded character
 					rec_input = rec_input + (0b10000000 >> rec_count);
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 				// Dit and dah paddle at same time (rare case)
@@ -1939,20 +1954,22 @@ int main(void)
 					// Add this element to the recorded character
 					rec_input = rec_input + (0b10000000 >> rec_count + 1);
 					rec_count = rec_count + 2;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
-
-				//else
-				//{
-				//	cur_state = STATE_IDLE;
-				//	cur_state_end = cur_timer;
-				//}
+				else
+				{
+					//rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+				}
 
 				// Handle character record timeout
 				// Need to handle SPACE
 				if((cur_timer > rec_timeout) && (rec_count > 0))
 					cur_state = STATE_VALIDATECHAR;
+				else if((cur_timer > rec_space_timeout) && (rec_count == 0) && (rec_space_last == FALSE))
+				{
+					cur_state = STATE_VALIDATECHAR;
+				}
 
 				// If CMD is pressed, we are done recording
 				if(cmd_btn == BTN_PRESS)
@@ -1974,11 +1991,13 @@ int main(void)
 				if((dah_active == TRUE) && (next_state == STATE_IDLE))
 				{
 					next_state = STATE_DAH;
+					rec_timeout = cur_timer + REC_EXPIRATION;
+					rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
 					// Add this element to the recorded character
 					rec_input = rec_input + (0b10000000 >> rec_count);
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 
@@ -1998,10 +2017,12 @@ int main(void)
 				if((dit_active == TRUE) && (next_state == STATE_IDLE))
 				{
 					next_state = STATE_DIT;
+					rec_timeout = cur_timer + REC_EXPIRATION;
+					rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
 					// Add this element to the recorded character
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 
@@ -2026,7 +2047,10 @@ int main(void)
 					else if(next_state == STATE_VALIDATECHAR)
 						cur_state = STATE_VALIDATECHAR;
 					else
+					{
 						cur_state = STATE_IDLE;
+						rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+					}
 
 					prev_state = STATE_DITDELAY;
 					next_state = STATE_IDLE;
@@ -2035,20 +2059,24 @@ int main(void)
 				if((dit_active == TRUE) && (prev_state == STATE_DAH) && (next_state == STATE_IDLE))
 				{
 					next_state = STATE_DIT;
+					rec_timeout = cur_timer + REC_EXPIRATION;
+					rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
 					// Add this element to the recorded character
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 				else if((dah_active == TRUE) && (prev_state == STATE_DIT) && (next_state == STATE_IDLE))
 				{
 					next_state = STATE_DAH;
+					rec_timeout = cur_timer + REC_EXPIRATION;
+					rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
 					// Add this element to the recorded character
 					rec_input = rec_input + (0b10000000 >> rec_count);
 					rec_count++;
-					if(rec_count >= 6)
+					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;
 				}
 
@@ -2062,52 +2090,112 @@ int main(void)
 
 				// If rec_input is 0, dump to invalid
 
-				// TODO: Need to count number of chars
-
 				// Tack a trailing "1" onto rec_input to indicate end of character
 				rec_input = rec_input + (0b10000000 >> rec_count);
 
-				for(val_index = MORSE_CHAR_START; val_index <= 'Z'; val_index++)
+				if(rec_count == 0)
 				{
-					if(rec_input == pgm_read_byte(&morsechar[val_index - MORSE_CHAR_START]))
+					// Insert a space into the message buffer
+					strncat(msg_buffer, " ", 1);
+					rec_space_last = TRUE;
+					rec_input = 0;
+					rec_count = 0;
+					cur_state = STATE_IDLE;
+					rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+
+					if(++rec_char_count >= (MSG_BUFFER_SIZE - 1))
+						cur_state = STATE_EXIT;
+
+					announce("E", ST_HIGH, 22);
+
+				}
+				else if(rec_input == 0b00000000 && rec_count >= 8) // erase last character
+				{
+					if(rec_char_count > 0)
 					{
-						// Add recorded character to text buffer
-						//char temp_str[2] = {val_index, '\0'};
-						//temp_str[0] = val_index;
-						//temp_str[1] = '\0';
-						strncat(msg_buffer, &val_index, 1);
+						strncpy(text_buffer, msg_buffer, --rec_char_count);
+						strcpy(msg_buffer, text_buffer);
 
 						// Reinitialize the current recorded character
 						rec_input = 0;
 						rec_count = 0;
+						rec_space_last = TRUE;
 						cur_state = STATE_IDLE;
+						rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
-						// Indicate successful entry
-						announce("E", ST_HIGH, 22);
-						break;
+						announce("T", ST_LOW, 22);
+					}
+					else
+					{
+						// Reinitialize the current recorded character
+						rec_input = 0;
+						rec_count = 0;
+						rec_space_last = TRUE;
+						cur_state = STATE_IDLE;
+						rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+						announce("X", ST_LOW, 22);
+					}
+				}
+				else
+				{
+					for(val_index = MORSE_CHAR_START; val_index <= 'Z'; val_index++)
+					{
+						if(rec_input == pgm_read_byte(&morsechar[val_index - MORSE_CHAR_START]))
+						{
+							// Add recorded character to text buffer
+							strncat(msg_buffer, &val_index, 1);
+
+							// Reinitialize the current recorded character
+							rec_input = 0;
+							rec_count = 0;
+							rec_space_last = FALSE;
+							cur_state = STATE_IDLE;
+							rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+
+
+							if(++rec_char_count >= (MSG_BUFFER_SIZE - 1))
+								cur_state = STATE_EXIT;
+
+							// Indicate successful entry
+							announce("E", ST_HIGH, 22);
+
+							break;
+						}
+					}
+
+					// If no match, the character isn't valid. Toss it out and announce error
+					// No match if rec_input is not reset to 0
+					if(val_index > 'Z')
+					{
+						// Reinitialize the current recorded character
+						rec_input = 0;
+						rec_count = 0;
+						cur_state = STATE_IDLE;
+						rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
+
+						// Indicate an error
+						announce("X", ST_LOW, 22);
 					}
 				}
 
-				// If no match, the character isn't valid. Toss it out and announce error
-				// No match if rec_input is not reset to 0
-				if(val_index > 'Z')
-				{
-					// Reinitialize the current recorded character
-					rec_input = 0b10000000;
-					rec_count = 0;
-					cur_state = STATE_IDLE;
-
-					// Indicate an error
-					announce("X", ST_LOW, 22);
-				}
-
-				cur_state = STATE_IDLE;
+				//cur_state = STATE_IDLE;
+				//rec_space_timeout = cur_timer + REC_SPACE_EXPIRATION;
 
 				break;
 
 			case STATE_EXIT:
+				// Get rid of trailing space
+				if(rec_space_last == TRUE)
+				{
+					strncpy(text_buffer, msg_buffer, --rec_char_count);
+					strcpy(msg_buffer, text_buffer);
+				}
+
 				// Write the memory to EEPROM
-				eeprom_write_block((const void*)&msg_buffer, (void*)&ee_msg_mem_1, MSG_BUFFER_SIZE);
+				if(rec_msg == MSGMEM_1)
+					eeprom_write_block((const void*)&msg_buffer, (void*)&ee_msg_mem_1, MSG_BUFFER_SIZE);
+				else if(rec_msg == MSGMEM_2)
+					eeprom_write_block((const void*)&msg_buffer, (void*)&ee_msg_mem_2, MSG_BUFFER_SIZE);
 
 				// Unmute and reset back to default mode
 				mute_end = cur_timer;
@@ -2115,8 +2203,9 @@ int main(void)
 				cur_state = STATE_IDLE;
 				cur_mode = default_mode;
 
-				// Announce successful recording
-				announce("R", ST_HIGH, 22);
+				// Repeat the message buffer
+				announce(msg_buffer, st_freq, wpm);
+
 				break;
 
 			default:
