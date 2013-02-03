@@ -17,7 +17,6 @@
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <util/delay.h>
-//#include <avr/wdt.h>
 
 #include "morsechar.h"
 #include "sinewave.h"
@@ -111,10 +110,9 @@
 #define TX_OFF_DELAY			2
 #define MUTE_OFF_DELAY			200			// Mute off delay time (in 1 ms increments)
 #define ANNOUNCE_BUFFER_SIZE	41			// Buffer size for announce string
-//#define IF_FREQ					4915000UL	// IF frequency
-//#define FC_GATE_TIME			100 		// Frequency counter gate time (in 1 ms increments)
 #define MENU_EXPIRATION			4000		// Menu expiration time (in 1 ms increments)
 #define REC_EXPIRATION			1000		// Keyer memory character record expiration
+#define REC_SPACE_EXPIRATION	2000		// Keyer memory space character expiration
 #define MSG_BUFFER_SIZE			41			// Keyer message size in characters
 #define SLEEP_DELAY				300			// Time (in ms) to delay before going to sleep because of inactivity
 #define ST_REFCLK				429497		// Sidetone DDS ref clock - 2^32 / 10 kHz sample rate
@@ -128,9 +126,6 @@
 #define DDS_100HZ				0x86
 
 // Band constants
-//#define DDS_INIT				0x05111F0C	// 14.060 MHz
-//#define DDS_INIT				0x0DC0981	// AD9834 w/ 75 MHz Fc, 4.029 MHz VFO
-//#define DDS_INIT				0x2CF7015	// AD9834 w/ 75 MHz Fc, 13.174 MHz VFO - 700 Hz shift
 #define DDS_INIT				0x4372820	// AD9834 w/ 50 MHz Fc, 13.174 MHz VFO - 700 Hz shift
 #define DDS_TX_INIT				0x23FE5C9
 #define FREQ_INIT				7030000
@@ -157,7 +152,8 @@ uint32_t cur_state_end, prev_state_end, sleep_timer;
 enum STATE prev_state, cur_state, next_state;
 enum MODE prev_mode, cur_mode, default_mode;
 char * announce_buffer;
-char msg_buffer[MSG_BUFFER_SIZE];
+char * text_buffer;
+static char msg_buffer[MSG_BUFFER_SIZE];
 char menu[] = {'S', 'W', 'R', 'V', 'K', '\0'};
 enum TUNERATE tune_rate = TUNE_FAST;
 uint16_t tune_step = DDS_100HZ;
@@ -167,7 +163,6 @@ enum VFO rx_vfo = VFO_RX;
 
 // Global variables used in ISRs
 volatile uint32_t timer, cur_timer;
-//volatile uint16_t fc_ovf, fc_count, fc_period;
 volatile uint8_t ind;
 volatile uint8_t port_b_latch, port_d_latch;
 volatile unsigned long freq;
@@ -192,8 +187,8 @@ volatile uint16_t st_period;
 // EEPROM variables
 uint8_t EEMEM ee_wpm = DEFAULT_WPM;
 enum BOOL EEMEM ee_keyer = TRUE;
-char EEMEM ee_msg_mem_1[MSG_BUFFER_SIZE - 1] = "CQ CQ CQ DE NT7S NT7S K";
-char EEMEM ee_msg_mem_2[MSG_BUFFER_SIZE - 1] = "NT7S";
+char EEMEM ee_msg_mem_1[MSG_BUFFER_SIZE] = "CQ CQ CQ DE NT7S NT7S K";
+char EEMEM ee_msg_mem_2[MSG_BUFFER_SIZE] = "NT7S";
 uint32_t EEMEM ee_dds_init = DDS_INIT;
 
 // Function prototypes
@@ -206,7 +201,6 @@ void count_frequency(void);
 void poll_buttons(void);
 void tune_dds(uint32_t dds_word, enum FREQREG reg, enum BOOL init);
 void tx_dds(enum BOOL tx);
-//void init_dds(uint32_t, enum FREQREG);
 void send_dds_word(uint16_t);
 void set_dds_freq_reg(enum FREQREG reg);
 void set_st_freq(uint32_t);
@@ -245,42 +239,12 @@ ISR(TIMER1_COMPA_vect)
 	sei();
 }
 
-// Timer1 ISR
-//
-// Timer1 is used as the frequency counter. The only thing we need to do during this ISR is
-// capture the number of timer overflows as a "17th bit" for the counter.
-/*
-ISR(TIMER1_OVF_vect)
-{
-	//fc_ovf++;
-}
-*/
-
 // Timer2 ISR
 //
-// Fires every 1 ms. Used as a main system clock, for frequency counting, and handles the
+// Fires every 1 ms. Used as a main system clock, and handles the
 // mute and transmit ports.
 ISR(TIMER2_COMPA_vect)
 {
-	/*
-	uint8_t sreg;
-
-	fc_period++;
-
-	if(fc_period >= FC_GATE_TIME)
-	{
-		fc_done = TRUE;
-		sreg = SREG;
-		fc_count = TCNT1;
-		SREG = sreg;
-		TCNT1 = 0;
-		freq = (((fc_ovf * 0x10000) + fc_count) * (1000 / FC_GATE_TIME)) + IF_FREQ;
-
-		fc_period = 0;
-		fc_ovf = 0;
-	}
-	*/
-
 	// Handle mute
 	if(((timer > mute_start) && (timer < mute_end)) || (mute_on == TRUE))
 	//if(mute_on == TRUE)
@@ -476,15 +440,6 @@ void init(void)
 
 	MUTE_PORT |= _BV(MUTE);
 
-	// Get initial button states
-
-	for (uint16_t i = 0; i < DEBOUNCE_HOLD_TIME; i++)
-	{
-		_delay_ms(1);
-		//debounce(FALSE);
-	}
-
-	//eeprom_busy_wait();
 	wpm = eeprom_read_byte(&ee_wpm);
 	set_wpm(wpm);
 
@@ -497,7 +452,6 @@ void init(void)
 	if((dah_active == TRUE) && (dit_active == FALSE))
 		cur_mode = MODE_SK;
 
-	//if(enc_btn == BTN_HOLD || enc_btn == BTN_PRESS)
 	if(bit_is_clear(ENC_BUTTON_PIN, ENC_BUTTON))
 	{
 		cur_mode = MODE_CAL;
@@ -507,6 +461,10 @@ void init(void)
 	TX_PORT &= ~(_BV(TX));
 
 	i2c_init();
+
+	// Delay for just a bit to let AF amp get ready before starting
+	for (uint16_t i = 0; i < 300; i++)
+		_delay_ms(1);
 
 	MUTE_PORT &= ~(_BV(MUTE));
 
@@ -1087,39 +1045,6 @@ void tx_dds(enum BOOL tx)
 		send_dds_word(0x2018);
 }
 
-/*
-void init_dds(uint32_t dds_word, enum FREQREG reg)
-{
-	uint16_t dds_word_high, dds_word_low, freq_reg;
-
-	if(reg == REG_1)
-		freq_reg = 0x8000;
-	else
-		freq_reg = 0x4000;
-
-	dds_word_low = (uint16_t)((dds_word & 0x3FFF) + freq_reg);
-	dds_word_high = (uint16_t)(((dds_word >> 14) & 0x3FFF) + freq_reg);
-
-	// Control register
-	//if(reg == REG_1)
-		//send_dds_word(0x2900);
-	//else
-		send_dds_word(0x2100);
-
-	// Send frequency word LSB
-	send_dds_word(dds_word_low);
-
-	// Send frequency word MSB
-	send_dds_word(dds_word_high);
-
-	// Send phase
-	send_dds_word(0xC000);
-
-	// Exit reset
-	send_dds_word(0x2000);
-}
-*/
-
 void send_dds_word(uint16_t dds_word)
 {
 	SPI_PORT |= _BV(SPI_SCK);
@@ -1196,29 +1121,6 @@ uint8_t i2c_status(void)
 	return status;
 }
 
-/*
-uint8_t dac_write(uint16_t dac_value)
-{
-	i2c_start();
-	if(i2c_status() != 0x08)
-		return FALSE;
-	i2c_write(DAC_I2C_ADDR);
-	if(i2c_status() != 0x18)
-		return FALSE;
-	i2c_write(0x40);
-	if(i2c_status() != 0x28)
-		return FALSE;
-	i2c_write((uint8_t)((dac_value >> 4) & 0xFF));
-	if(i2c_status() != 0x28)
-		return FALSE;
-	i2c_write((uint8_t)((dac_value << 4) & 0xFF));
-	if(i2c_status() != 0x28)
-		return FALSE;
-	i2c_stop();
-	return TRUE;
-}
-*/
-
 int main(void)
 {
 	//static uint32_t cur_timer = 0;
@@ -1228,8 +1130,7 @@ int main(void)
 	static char * cur_char_p;
 	static char * cur_menu_p;
 	static char * cur_menu;
-	static char * text_buffer;
-	static uint8_t val_index;
+	static char val_index;
 
 	announce_buffer = malloc(ANNOUNCE_BUFFER_SIZE);
 	memset(announce_buffer, '\0', ANNOUNCE_BUFFER_SIZE);
@@ -1746,7 +1647,7 @@ int main(void)
 							cur_state_end = cur_timer + MENU_EXPIRATION;
 							cur_mode = MODE_SETWPM;
 
-							announce("R", st_freq, wpm);
+							announce("R", ST_HIGH, 22);
 							break;
 
 						// Read WPM
@@ -1763,7 +1664,7 @@ int main(void)
 							cur_state = STATE_INIT;
 							cur_mode = MODE_RECORD;
 
-							announce("R", st_freq, wpm);
+							announce("R", ST_HIGH, 22);
 							break;
 
 						// Read voltage
@@ -1784,7 +1685,7 @@ int main(void)
 								eeprom_busy_wait();
 								eeprom_write_byte(&ee_keyer, FALSE);
 
-								announce("S", st_freq, wpm);
+								announce("S", ST_HIGH, wpm);
 							}
 							else
 							{
@@ -1794,7 +1695,7 @@ int main(void)
 								eeprom_busy_wait();
 								eeprom_write_byte(&ee_keyer, TRUE);
 
-								announce("K", st_freq, wpm);
+								announce("K", ST_HIGH, wpm);
 							}
 							break;
 
@@ -1809,7 +1710,6 @@ int main(void)
 					cur_mode = default_mode;
 
 					// Send "X" to indicate expiration
-					//set_st_freq(ST_LOW);
 					announce("X", ST_LOW, wpm);
 				}
 
@@ -1979,7 +1879,7 @@ int main(void)
 				break;
 			}
 			break;
-		/*
+
 		case MODE_RECORD:
 			switch(cur_state)
 			{
@@ -1992,7 +1892,7 @@ int main(void)
 				rec_count = 0;
 				rec_timeout = UINT32_MAX;
 
-				memset(text_buffer, '\0', MSG_BUFFER_SIZE);
+				strcpy(msg_buffer, "");
 
 				cur_state = STATE_IDLE;
 				break;
@@ -2011,7 +1911,6 @@ int main(void)
 					rec_count++;
 					if(rec_count >= 6)
 						next_state = STATE_VALIDATECHAR;
-
 				}
 				// Dah paddle only
 				else if((dah_active == TRUE) && (dit_active == FALSE))
@@ -2038,8 +1937,8 @@ int main(void)
 					rec_timeout = cur_timer + REC_EXPIRATION;
 
 					// Add this element to the recorded character
-					rec_input = rec_input + (0b10000000 >> (rec_count + 1));
-					rec_count += 2;
+					rec_input = rec_input + (0b10000000 >> rec_count + 1);
+					rec_count = rec_count + 2;
 					if(rec_count >= 6)
 						next_state = STATE_VALIDATECHAR;
 				}
@@ -2052,7 +1951,7 @@ int main(void)
 
 				// Handle character record timeout
 				// Need to handle SPACE
-				if((cur_timer > rec_timeout))// && (rec_input > 0))
+				if((cur_timer > rec_timeout) && (rec_count > 0))
 					cur_state = STATE_VALIDATECHAR;
 
 				// If CMD is pressed, we are done recording
@@ -2073,7 +1972,15 @@ int main(void)
 				}
 
 				if((dah_active == TRUE) && (next_state == STATE_IDLE))
+				{
 					next_state = STATE_DAH;
+
+					// Add this element to the recorded character
+					rec_input = rec_input + (0b10000000 >> rec_count);
+					rec_count++;
+					if(rec_count >= 6)
+						next_state = STATE_VALIDATECHAR;
+				}
 
 				key_down = FALSE;
 				sidetone_on = TRUE;
@@ -2089,7 +1996,14 @@ int main(void)
 				}
 
 				if((dit_active == TRUE) && (next_state == STATE_IDLE))
+				{
 					next_state = STATE_DIT;
+
+					// Add this element to the recorded character
+					rec_count++;
+					if(rec_count >= 6)
+						next_state = STATE_VALIDATECHAR;
+				}
 
 				key_down = FALSE;
 				sidetone_on = TRUE;
@@ -2119,9 +2033,24 @@ int main(void)
 				}
 
 				if((dit_active == TRUE) && (prev_state == STATE_DAH) && (next_state == STATE_IDLE))
+				{
 					next_state = STATE_DIT;
+
+					// Add this element to the recorded character
+					rec_count++;
+					if(rec_count >= 6)
+						next_state = STATE_VALIDATECHAR;
+				}
 				else if((dah_active == TRUE) && (prev_state == STATE_DIT) && (next_state == STATE_IDLE))
+				{
 					next_state = STATE_DAH;
+
+					// Add this element to the recorded character
+					rec_input = rec_input + (0b10000000 >> rec_count);
+					rec_count++;
+					if(rec_count >= 6)
+						next_state = STATE_VALIDATECHAR;
+				}
 
 				key_down = FALSE;
 				sidetone_on = FALSE;
@@ -2133,18 +2062,20 @@ int main(void)
 
 				// If rec_input is 0, dump to invalid
 
+				// TODO: Need to count number of chars
+
 				// Tack a trailing "1" onto rec_input to indicate end of character
 				rec_input = rec_input + (0b10000000 >> rec_count);
 
 				for(val_index = MORSE_CHAR_START; val_index <= 'Z'; val_index++)
 				{
-					if(rec_input == pgm_read_byte(&morsechar[val_index]))
+					if(rec_input == pgm_read_byte(&morsechar[val_index - MORSE_CHAR_START]))
 					{
 						// Add recorded character to text buffer
-						char temp_str[2] = {val_index, '\0'};
+						//char temp_str[2] = {val_index, '\0'};
 						//temp_str[0] = val_index;
 						//temp_str[1] = '\0';
-						strcat(text_buffer, temp_str);
+						strncat(msg_buffer, &val_index, 1);
 
 						// Reinitialize the current recorded character
 						rec_input = 0;
@@ -2152,14 +2083,14 @@ int main(void)
 						cur_state = STATE_IDLE;
 
 						// Indicate successful entry
-						//pwm_delay = HIGHFREQ_PWM_DELAY;
-						//announce("E");
+						announce("E", ST_HIGH, 22);
+						break;
 					}
 				}
 
 				// If no match, the character isn't valid. Toss it out and announce error
 				// No match if rec_input is not reset to 0
-				if(rec_input != 0)
+				if(val_index > 'Z')
 				{
 					// Reinitialize the current recorded character
 					rec_input = 0b10000000;
@@ -2167,8 +2098,7 @@ int main(void)
 					cur_state = STATE_IDLE;
 
 					// Indicate an error
-					//set_st_freq(ST_LOW);
-					announce("X", ST_LOW, wpm);
+					announce("X", ST_LOW, 22);
 				}
 
 				cur_state = STATE_IDLE;
@@ -2177,7 +2107,7 @@ int main(void)
 
 			case STATE_EXIT:
 				// Write the memory to EEPROM
-				eeprom_update_block((const void*)&text_buffer, (void*)&ee_msg_mem_1, 40);
+				eeprom_write_block((const void*)&msg_buffer, (void*)&ee_msg_mem_1, MSG_BUFFER_SIZE);
 
 				// Unmute and reset back to default mode
 				mute_end = cur_timer;
@@ -2186,14 +2116,14 @@ int main(void)
 				cur_mode = default_mode;
 
 				// Announce successful recording
-				announce("R", st_freq, wpm);
+				announce("R", ST_HIGH, 22);
 				break;
 
 			default:
 				break;
 			}
 			break;
-		*/
+
 
 		// Don't really need to do anything here except let the RX tune
 		case MODE_CAL:
