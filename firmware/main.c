@@ -1,10 +1,37 @@
 /*
  * main.c
  *
- *  Created on: Oct 20, 2010
- *      Author: Jason Milldrum, NT7S
+ *  Created on: Feb 24, 2013
+ *      Author: Jason Milldrum
+ *     Company: Etherkit
+ *
+ *     Copyright (c) 2013, Jason Milldrum
+ *     All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *  - Redistributions of source code must retain the above copyright notice, this list
+ *  of conditions and the following disclaimer.
+ *
+ *  - Redistributions in binary form must reproduce the above copyright notice, this list
+ *  of conditions and the following disclaimer in the documentation and/or other
+ *  materials provided with the distribution.
+ *
+ *  - Neither the name of Etherkit nor the names of its contributors may be
+ *  used to endorse or promote products derived from this software without specific
+ *  prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ *  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ *  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ *  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
@@ -108,7 +135,7 @@
 #define MAX_WPM					40			// Maximum WPM setting
 #define TX_ON_DELAY				2			// TX sequence delay time (in 1 ms increments)
 #define TX_OFF_DELAY			2
-#define MUTE_OFF_DELAY			200			// Mute off delay time (in 1 ms increments)
+#define MUTE_OFF_DELAY			20			// Mute off delay time (in 1 ms increments)
 #define ANNOUNCE_BUFFER_SIZE	41			// Buffer size for announce string
 #define MENU_EXPIRATION			4000		// Menu expiration time (in 1 ms increments)
 #define REC_EXPIRATION			1000		// Keyer memory character record expiration
@@ -119,18 +146,36 @@
 #define ST_DEFAULT				600			// Default sidetone frequency
 #define ST_HIGH					900			// High sidetone frequency
 #define ST_LOW					400			// Low sidetone frequency
-#define LED_BLINK				500			// LED blink time in ms
 
 // DDS tuning steps (50 MHz master clock)
 #define DDS_20HZ				0x1B
 #define DDS_100HZ				0x86
 
+// Band selection
+// Use this section to choose the proper band for your CC1
+// Uncomment the desired band and make sure all other bands are commented out
+
+//#define BAND_40M
+#define BAND_20M
+
 // Band constants
-#define DDS_INIT				0x4372820	// AD9834 w/ 50 MHz Fc, 13.174 MHz VFO - 700 Hz shift
+// 40 Meters
+#ifdef BAND_40M
+#define DDS_INIT				0x3D2806B	// AD9834 w/ 50 MHz Fc, 11.945 MHz VFO - 600 Hz shift
 #define DDS_TX_INIT				0x23FE5C9
 #define FREQ_INIT				7030000
 #define LOWER_FREQ_LIMIT		7000000
 #define UPPER_FREQ_LIMIT		7300000
+#endif
+
+// 20 Meters
+#ifdef BAND_20M
+#define DDS_INIT				0x2ED30F0 	// AD9834 w/ 50 MHz Fc, 9.1454 MHz VFO + 600 Hz shift
+#define DDS_TX_INIT				0x47FCB92
+#define FREQ_INIT				14060000
+#define LOWER_FREQ_LIMIT		14000000
+#define UPPER_FREQ_LIMIT		14350000
+#endif
 
 // Macro for any button press
 #define ANYBUTTON				(dit_active == TRUE) || (dah_active == TRUE) || (cmd_btn == BTN_PRESS) || (msg_btn == BTN_PRESS)
@@ -188,8 +233,8 @@ volatile uint16_t st_period;
 // EEPROM variables
 uint8_t EEMEM ee_wpm = DEFAULT_WPM;
 enum BOOL EEMEM ee_keyer = TRUE;
-char EEMEM ee_msg_mem_1[MSG_BUFFER_SIZE] = "CQ CQ CQ DE NT7S NT7S K";
-char EEMEM ee_msg_mem_2[MSG_BUFFER_SIZE] = "NT7S";
+char EEMEM ee_msg_mem_1[MSG_BUFFER_SIZE] = "";
+char EEMEM ee_msg_mem_2[MSG_BUFFER_SIZE] = "";
 uint32_t EEMEM ee_dds_init = DDS_INIT;
 
 // Function prototypes
@@ -408,13 +453,12 @@ void init(void)
 	ENC_BUTTON_PORT |= _BV(ENC_BUTTON); // Enable pull-up
 
 	// Configure SPI
-	uint8_t spi_data;
 	SPI_DDR |= _BV(SPI_MOSI) | _BV(SPI_SCK) | _BV(SPI_SS) | _BV(SPI_FSYNC);
 	//SPCR = _BV(SPE) | _BV(MSTR) |_BV(CPOL) | _BV(SPR0);
 	SPCR = _BV(SPE) | _BV(MSTR) | _BV(CPOL) | _BV(SPI2X);
 	//SPI_PORT |= _BV(SPI_SS);
 
-	spi_data = SPSR; // Dummy read to clear interrupt flag
+	uint8_t spi_data = SPSR; // Dummy read to clear interrupt flag
 	spi_data = SPDR;
 
 	//set_sleep_mode(SLEEP_MODE_STANDBY);
@@ -1320,8 +1364,8 @@ int main(void)
 					prev_state = STATE_DIT;
 					cur_state = STATE_DITDELAY;
 					cur_state_end = cur_timer + dit_length;
-					//mute_start = cur_timer;
-					//mute_end = cur_state_end + MUTE_OFF_DELAY;
+					mute_start = cur_timer;
+					mute_end = cur_state_end + MUTE_OFF_DELAY;
 				}
 
 				if((dah_active == TRUE) && (next_state == STATE_IDLE))
@@ -1348,8 +1392,8 @@ int main(void)
 					prev_state = STATE_DAH;
 					cur_state = STATE_DITDELAY;
 					cur_state_end = cur_timer + dit_length;
-					//mute_start = cur_timer;
-					//mute_end = cur_state_end + MUTE_OFF_DELAY;
+					mute_start = cur_timer;
+					mute_end = cur_state_end + MUTE_OFF_DELAY;
 				}
 
 				if((dit_active == TRUE) && (next_state == STATE_IDLE))
@@ -1892,6 +1936,8 @@ int main(void)
 			}
 			break;
 
+			// TODO: Review current recording
+			// TODO: Cancel recording
 		case MODE_RECORD:
 			switch(cur_state)
 			{
@@ -1952,7 +1998,7 @@ int main(void)
 					rec_timeout = cur_timer + REC_EXPIRATION;
 
 					// Add this element to the recorded character
-					rec_input = rec_input + (0b10000000 >> rec_count + 1);
+					rec_input = rec_input + (0b10000000 >> (rec_count + 1));
 					rec_count = rec_count + 2;
 					if(rec_count > 8)
 						next_state = STATE_VALIDATECHAR;

@@ -1,0 +1,122 @@
+CC1 BOM
+Etherkit
+24 Feb 2013
+
+| Part (marking)                  | Qty  | Ref                            | P/N
+======================================================================================================
+Capacitors (all values pF unless specified)
+| 3.3n                              2      C16, C26       
+| 10n                               8      C37, C42, C61, C65, C71,
+                                           C72, C74, C76       
+| 100n                              27     C2, C9, C12, C13, C14, C15,
+                                           C18, C19, C23, C30, C31, C32,
+                                           C35, C38, C43, C44, C45, C46,
+                                           C47, C48, C49, C50, C52, C58,
+                                           C59, C60, C63       
+| 100n (ceramic leaded)             1      C53       
+| 1u MLCC                           6      C5, C17, C25, C56, C64, C69        
+| 4.7u MLCC                         3      C11, C66, C75       
+| 10u electrolytic                  2      C33, C36       
+| 100u electrolytic                 3      C20, C29, C51       
+| 22                                1      C67       
+| 33                                3      C34, C39, C40       
+| 39                                2      C68, C73       
+| 45 trim                           1      C41       
+| 68                                1      C70       
+| 100                               2      C22, C27     
+| 120                               3      C21, C24, C28       
+
+Diodes
+| BAT46W                            1      D1        
+| BAV99                             2      D2, D3        
+| BAT54S                            1      D4        
+| BZV55-B33                         1      D5        
+| Red/Green Dual LED                1      D6                               Lumex SSF-LXH240GID
+| BZV55-B15                         1      D7
+
+Connectors        
+| 3.5 mm stereo - blue              1      J1                               Kycon STX-3120-5B-284C
+| 3.5 mm stereo - green             1      J2                               Kycon STX-3120-3B-577C
+| 0.1" x 4 header - I2C             1      J3                               For expansion - not included with kit
+| 0.1" x 4 header - UART            1      J5                               For expansion - not included with kit
+| GPS                               1      J6                               Harwin M40-4010646
+| 0.1" x 3 header - ADC             1      J7                               For expansion - not included with kit
+| 2.1 mm barrel jack - +12VDC       1      J8                               Kobiconn 163-7620E-E       
+| BNC                               1      J9                               Amphenol 31-5431-10RFX      
+| AVR-ISP-6                         1      J4                               Molex 70287-1001
+
+Inductors
+| 22u                               1      L6        
+| BN2402-43 5T                      2      L4, L5        
+| FT37-43 10T                       2      L7, L8        
+| T37-2 21T                         2      L12, L3      
+
+Transistors       
+| 2N7002                            3      Q1, Q2, Q3       
+| BF998                             2      Q4, Q7       
+| MMBFJ310                          3      Q5, Q6, Q8        
+| FDS86106                          1      Q9        
+| IRLML9301                         1      Q10       
+
+Resistors (all resistors 0.1 watt 0805 unless specified)
+| 10                                3      R19, R21, R29      
+| 47                                6      R12, R18, R28, R33, R36, R62       
+| 100                               1      R26       
+| 100 - 0.5 watt 1206               1      R50       
+| 200                               2      R55, R56       
+| 220                               2      R27, R59       
+| 470                               2      R14, R35       
+| 1k                                5      R20, R30, R37, R52, R53       
+| 2.2k                              6      R13, R16, R23, R31, R32, R34       
+| 3.3k                              2      R11, R61       
+| 4.7k                              6      R15, R24, R47, R49, R58, R60       
+| 5k trim pot                       1      R41                              Bournes TC33X-2-502E
+| 6.8k                              3      R9, R22, R54        
+| 10k audio pot                     1      R4                               Alpha RV09AF-20-20K-A14
+| 10k                               5      R42, R43, R44, R45, R46       
+| 22k                               1      R48       
+| 33k                               2      R39, R40      
+| 47k                               3      R17, R25, R51       
+| 100k                              8      R1, R2, R3, R5, R7, R8, R38,
+                                           R57        
+| 1M                                1      R6
+
+Buttons and Encoders        
+| Pushbutton                        2      S1, S2                           C&K PTS645VH58LFS
+| Rotary encoder - Tune             1      S3                               BI EN12-VS11AF18       
+
+Transformers
+| FT37-43 20T:5T                    1      T1
+
+ICs        
+| NE5532                            1      U1                               TI NE5532DR
+| 74AC08                            1      U2                               TI SN74AC08DRG4
+| 50 MHz oscillator                 1      U4                               Vectron VCC1-B3D-50M0000000       
+| AD9834                            1      U5                               Analog Devices AD9834BRUZ
+| LP2985-33                         1      U6                               TI LP2985-33DBVR
+| LP2985-50                         1      U7                               TI LP2985-50DBVR
+| OPA820                            1      U8                               TI OPA820IDBVT
+| ATMEGA328P                        1      U3                               Atmel ATMEGA328P-AU
+
+Crystals        
+| 4.9152 MHz                        5      X1, X2, X3, X4, X5               Abracon ABLS-4.9152MHZ-B4-T
+
+Frequency Dependent Components
+           | C1 | C3 | C4  | C6/C8            | C7  | C10 | C54/C62            | C55/C57
+40 Meters  | 47 | 47 | 100 | 45 trim (yellow) | 4.7 | 150 | 330 (ceramic disc) | 680 (ceramic disc)
+20 Meters  | 22 | 22 | 33  | 45 trim (yellow) | 2.2 | 47  | 180 (ceramic disc) | 390 (ceramic disc)
+
+           | L1                    | L2/L3           | L9/L11          | L10
+40 Meters  | T50-2 (large red) 47T | T37-2 (red) 25T | T37-2 (red) 18T | T37-2 (red) 20T
+20 Meters  | T50-2 (large red) 33T | T37-2 (red) 19T | T37-2 (red) 12T | T37-2 (red) 13T
+
+           | R10
+40 Meters  | 10k
+20 Meters  | 10k
+
+Miscellaneous
+| Red Magnet Wire, 28 AWG (feet)    15
+| Green Magnet Wire, 28 AWG (feet)  1
+| Tuning knob                       1                                       Eagle 450-4763
+| PCB
+| Aluminum enclosure

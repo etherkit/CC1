@@ -1,0 +1,412 @@
+eeschema (2013-feb-21)-testing  >> Creation date: Sun 24 Feb 2013 09:59:55 AM PST
+#Cmp ( order = Reference )
+| C1         C           
+| C2         100n        
+| C3         C           
+| C4         C           
+| C5         1u MLCC     
+| C6         CTRIM       
+| C7         C           
+| C8         CTRIM       
+| C9         100n        
+| C10        C           
+| C11        4.7u MLCC   
+| C12        100n        
+| C13        100n        
+| C14        100n        
+| C15        100n        
+| C16        3.3n        
+| C17        1u MLCC     
+| C18        100n        
+| C19        100n        
+| C20        100u        
+| C21        120         
+| C22        100         
+| C23        100n        
+| C24        120         
+| C25        1u MLCC     
+| C26        3.3n        
+| C27        100         
+| C28        120         
+| C29        100u        
+| C30        100n        
+| C31        100n        
+| C32        100n        
+| C33        10u         
+| C34        33          
+| C35        100n        
+| C36        10u         
+| C37        10n         
+| C38        100n        
+| C39        33          
+| C40        33          
+| C41        45          
+| C42        10n         
+| C43        100n        
+| C44        100n        
+| C45        100n        
+| C46        100n        
+| C47        100n        
+| C48        100n        
+| C49        100n        
+| C50        100n        
+| C51        100u        
+| C52        100n        
+| C53        100n        
+| C54        100n        
+| C55        100n        
+| C56        1u MLCC     
+| C57        100n        
+| C58        100n        
+| C59        100n        
+| C60        100n        
+| C61        10n         
+| C62        100n        
+| C63        100n        
+| C64        1u MLCC     
+| C65        10n         
+| C66        4.7u MLCC   
+| C67        22          
+| C68        39          
+| C69        1u MLCC     
+| C70        68          
+| C71        10n         
+| C72        10n         
+| C73        39          
+| C74        10n         
+| C75        4.7u MLCC   
+| C76        10n         
+| D1         BAT46W      
+| D2         BAV99       
+| D3         BAV99       
+| D4         BAT54S      
+| D5         BZV55-B33   
+| D6         Lumex SSF-LXH240GID
+| D7         BZV55-B15   
+| J1         Phones - 3.5mm Stereo
+| J2         3.5 mm stereo
+| J3         I2C         
+| J4         AVR-ISP-6   
+| J5         UART        
+| J6         GPS         
+| J7         ADC         
+| J8         +12VDC      
+| J9         BNC         
+| L1         L-IRONCORE  
+| L2         L-IRONCORE  
+| L3         L-IRONCORE  
+| L4         BN2402-43 5T
+| L5         BN2402-43 5T
+| L6         22u         
+| L7         FT37-43 10T 
+| L8         FT37-43 10T 
+| L9         L-IRONCORE  
+| L10        L-IRONCORE  
+| L11        L-IRONCORE  
+| L12        T37-2 21T   
+| L13        T37-2 21T   
+| P1         XTAL GND    
+| P2         BFO         
+| P3         TX Drive    
+| P5         +3.3V       
+| P6         +12V        
+| P7         GND         
+| P8         +5V         
+| P9         VFO         
+| Q1         2N7002      
+| Q2         2N7002      
+| Q3         2N7002      
+| Q4         BF998       
+| Q5         MMBFJ310    
+| Q6         MMBFJ310    
+| Q7         BF998       
+| Q8         MMBFJ310    
+| Q9         FDS86106    
+| Q10        IRLML9301   
+| R1         100k        
+| R2         100k        
+| R3         100k        
+| R4         10k audio   
+| R5         100k        
+| R6         1M          
+| R7         100k        
+| R8         100k        
+| R9         6.8k        
+| R10        R           
+| R11        3.3k        
+| R12        47          
+| R13        2.2k        
+| R14        470         
+| R15        4.7k        
+| R16        2.2k        
+| R17        47k         
+| R18        47          
+| R19        10          
+| R20        1k          
+| R21        10          
+| R22        6.8k        
+| R23        2.2k        
+| R24        4.7k        
+| R25        47k         
+| R26        100         
+| R27        220         
+| R28        47          
+| R29        10          
+| R30        1k          
+| R31        2.2k        
+| R32        2.2k        
+| R33        47          
+| R34        2.2k        
+| R35        470         
+| R36        47          
+| R37        1k          
+| R38        100k        
+| R39        33k         
+| R40        33k         
+| R41        5k          
+| R42        10k         
+| R43        10k         
+| R44        10k         
+| R45        10k         
+| R46        10k         
+| R47        4.7k        
+| R48        22k         
+| R49        4.7k        
+| R50        100         
+| R51        47k         
+| R52        1k          
+| R53        1k          
+| R54        6.8k        
+| R55        200         
+| R56        200         
+| R57        100k        
+| R58        4.7k        
+| R59        220         
+| R60        4.7k        
+| R61        3.3k        
+| R62        47          
+| S1         FREQ        
+| S2         CMD         
+| S3         BI EN12-VS11AF18
+| T1         FT37-43 20T:5T
+| U1         NE5532      
+| U2         74AC08      
+| U3         ATMEGA328P  
+| U4         VCC1-B3D-50M0000000
+| U5         AD9834      
+| U6         LP2985-3.3  
+| U7         LP2985-5    
+| U8         OPA820IDBVT 
+| X1         6.144 MHz   
+| X2         6.144 MHz   
+| X3         6.144 MHz   
+| X4         6.144 MHz   
+| X5         4.9152 MHz  
+#End Cmp
+
+#Cmp ( order = Value )
+| 3.3n         C16       
+| 3.3n         C26       
+| 10n          C37       
+| 10n          C42       
+| 10n          C61       
+| 10n          C65       
+| 10n          C71       
+| 10n          C72       
+| 10n          C74       
+| 10n          C76       
+| 100n         C2        
+| 100n         C9        
+| 100n         C12       
+| 100n         C13       
+| 100n         C14       
+| 100n         C15       
+| 100n         C18       
+| 100n         C19       
+| 100n         C23       
+| 100n         C30       
+| 100n         C31       
+| 100n         C32       
+| 100n         C35       
+| 100n         C38       
+| 100n         C43       
+| 100n         C44       
+| 100n         C45       
+| 100n         C46       
+| 100n         C47       
+| 100n         C48       
+| 100n         C49       
+| 100n         C50       
+| 100n         C52       
+| 100n         C53       
+| 100n         C54       
+| 100n         C55       
+| 100n         C57       
+| 100n         C58       
+| 100n         C59       
+| 100n         C60       
+| 100n         C62       
+| 100n         C63       
+| 1u MLCC      C5        
+| 1u MLCC      C17       
+| 1u MLCC      C25       
+| 1u MLCC      C56       
+| 1u MLCC      C64       
+| 1u MLCC      C69       
+| 4.7u MLCC    C11       
+| 4.7u MLCC    C66       
+| 4.7u MLCC    C75       
+| 10u          C33       
+| 10u          C36       
+| 100u         C20       
+| 100u         C29       
+| 100u         C51       
+| 22           C67       
+| 33           C34       
+| 33           C39       
+| 33           C40       
+| 39           C68       
+| 39           C73       
+| 45           C41       
+| 68           C70       
+| 100          C22       
+| 100          C27       
+| 120          C21       
+| 120          C24       
+| 120          C28       
+| C            C1        
+| C            C3        
+| C            C4        
+| CTRIM        C6        
+| C            C7        
+| CTRIM        C8        
+| C            C10       
+| BAT46W       D1        
+| BAV99        D2        
+| BAV99        D3        
+| BAT54S       D4        
+| BZV55-B33    D5        
+| Lumex SSF-LXH240GID D6        
+| BZV55-B15    D7        
+| 3.5 mm stereo J2        
+| Phones - 3.5mm Stereo J1        
+| I2C          J3        
+| UART         J5        
+| GPS          J6        
+| ADC          J7        
+| +12VDC       J8        
+| BNC          J9        
+| AVR-ISP-6    J4        
+| 22u          L6        
+| L-IRONCORE   L1        
+| L-IRONCORE   L2        
+| L-IRONCORE   L3        
+| BN2402-43 5T L4        
+| BN2402-43 5T L5        
+| FT37-43 10T  L7        
+| FT37-43 10T  L8        
+| L-IRONCORE   L9        
+| L-IRONCORE   L10       
+| L-IRONCORE   L11       
+| T37-2 21T    L12       
+| T37-2 21T    L13       
+| XTAL GND     P1        
+| BFO          P2        
+| TX Drive     P3        
+| +3.3V        P5        
+| +12V         P6        
+| GND          P7        
+| +5V          P8        
+| VFO          P9        
+| 2N7002       Q1        
+| 2N7002       Q2        
+| 2N7002       Q3        
+| BF998        Q4        
+| MMBFJ310     Q5        
+| MMBFJ310     Q6        
+| BF998        Q7        
+| MMBFJ310     Q8        
+| FDS86106     Q9        
+| IRLML9301    Q10       
+| 10           R19       
+| 10           R21       
+| 10           R29       
+| 47           R12       
+| 47           R18       
+| 47           R28       
+| 47           R33       
+| 47           R36       
+| 47           R62       
+| 100          R26       
+| 100          R50       
+| 200          R55       
+| 200          R56       
+| 220          R27       
+| 220          R59       
+| 470          R14       
+| 470          R35       
+| 1k           R20       
+| 1k           R30       
+| 1k           R37       
+| 1k           R52       
+| 1k           R53       
+| 2.2k         R13       
+| 2.2k         R16       
+| 2.2k         R23       
+| 2.2k         R31       
+| 2.2k         R32       
+| 2.2k         R34       
+| 3.3k         R11       
+| 3.3k         R61       
+| 4.7k         R15       
+| 4.7k         R24       
+| 4.7k         R47       
+| 4.7k         R49       
+| 4.7k         R58       
+| 4.7k         R60       
+| 5k           R41       
+| 6.8k         R9        
+| 6.8k         R22       
+| 6.8k         R54       
+| 10k audio    R4        
+| 10k          R42       
+| 10k          R43       
+| 10k          R44       
+| 10k          R45       
+| 10k          R46       
+| 22k          R48       
+| 33k          R39       
+| 33k          R40       
+| 47k          R17       
+| 47k          R25       
+| 47k          R51       
+| 100k         R1        
+| 100k         R2        
+| 100k         R3        
+| 100k         R5        
+| 100k         R7        
+| 100k         R8        
+| 100k         R38       
+| 100k         R57       
+| 1M           R6        
+| R            R10       
+| FREQ         S1        
+| CMD          S2        
+| BI EN12-VS11AF18 S3        
+| FT37-43 20T:5T T1        
+| NE5532       U1        
+| 74AC08       U2        
+| VCC1-B3D-50M0000000 U4        
+| AD9834       U5        
+| LP2985-3.3   U6        
+| LP2985-5     U7        
+| OPA820IDBVT  U8        
+| ATMEGA328P   U3        
+| 4.9152 MHz   X5        
+| 6.144 MHz    X1        
+| 6.144 MHz    X2        
+| 6.144 MHz    X3        
+| 6.144 MHz    X4        
+#End Cmp
+
+#End List
