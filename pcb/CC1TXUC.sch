@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 24 Feb 2013 04:48:14 PM PST
+EESchema Schematic File Version 2  date Sun 24 Feb 2013 06:59:34 PM PST
 LIBS:NT7S
 LIBS:power
 LIBS:device

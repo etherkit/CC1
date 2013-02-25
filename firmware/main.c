@@ -508,7 +508,7 @@ void init(void)
 	i2c_init();
 
 	// Delay for just a bit to let AF amp get ready before starting
-	for (uint16_t i = 0; i < 300; i++)
+	for (uint16_t i = 0; i < 500; i++)
 		_delay_ms(1);
 
 	MUTE_PORT &= ~(_BV(MUTE));
@@ -1049,6 +1049,7 @@ void poll_buttons(void)
 	prev_enc_state = cur_enc_state;
 }
 
+// TODO: Turn SPI on and off for tuning?
 void tune_dds(uint32_t dds_word, enum FREQREG reg, enum BOOL init)
 {
 	uint16_t dds_word_high, dds_word_low, freq_reg;
