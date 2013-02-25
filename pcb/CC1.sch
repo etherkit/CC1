@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 24 Feb 2013 09:43:58 AM PST
+EESchema Schematic File Version 2  date Sun 24 Feb 2013 04:48:14 PM PST
 LIBS:NT7S
 LIBS:power
 LIBS:device
@@ -37,7 +37,7 @@ $Descr A 11000 8500
 encoding utf-8
 Sheet 1 3
 Title "CC1 Transceiver"
-Date "24 feb 2013"
+Date "25 feb 2013"
 Rev "A"
 Comp "Etherkit"
 Comment1 ""

@@ -170,7 +170,7 @@
 
 // 20 Meters
 #ifdef BAND_20M
-#define DDS_INIT				0x2ED30F0 	// AD9834 w/ 50 MHz Fc, 9.1454 MHz VFO + 600 Hz shift
+#define DDS_INIT				0x6126634 	// AD9834 w/ 50 MHz Fc, 18.9752 MHz VFO + 600 Hz shift
 #define DDS_TX_INIT				0x47FCB92
 #define FREQ_INIT				14060000
 #define LOWER_FREQ_LIMIT		14000000

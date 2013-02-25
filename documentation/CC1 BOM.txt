@@ -8,13 +8,13 @@ Capacitors (all values pF unless specified)
 | 3.3n                              2      C16, C26       
 | 10n                               8      C37, C42, C61, C65, C71,
                                            C72, C74, C76       
-| 100n                              27     C2, C9, C12, C13, C14, C15,
-                                           C18, C19, C23, C30, C31, C32,
-                                           C35, C38, C43, C44, C45, C46,
-                                           C47, C48, C49, C50, C52, C58,
-                                           C59, C60, C63       
+| 100n                              29     C2, C9, C12, C13, C14, C15,
+                                           C17, C18, C19, C23, C25, C30,
+                                           C31, C32, C35, C38, C43, C44, 
+                                           C45, C46, C47, C48, C49, C50,
+                                           C52, C58, C59, C60, C63       
 | 100n (ceramic leaded)             1      C53       
-| 1u MLCC                           6      C5, C17, C25, C56, C64, C69        
+| 1u MLCC                           4      C5, C56, C64, C69        
 | 4.7u MLCC                         3      C11, C66, C75       
 | 10u electrolytic                  2      C33, C36       
 | 100u electrolytic                 3      C20, C29, C51       
