@@ -268,8 +268,8 @@ ISR(TIMER1_COMPA_vect)
 	cli();
 	if(sidetone_on == TRUE)
 	{
-		SIDETONE_DDR |= _BV(SIDETONE);
-		SIDETONE_PORT ^= _BV(SIDETONE);
+		//SIDETONE_DDR |= _BV(SIDETONE);
+		//SIDETONE_PORT ^= _BV(SIDETONE);
 
 		// PWM generator
 		st_phase_acc = st_phase_acc + st_tune_word;
@@ -279,8 +279,8 @@ ISR(TIMER1_COMPA_vect)
 	else
 	{
 		// Hi-Z the port when not using
-		SIDETONE_DDR &= ~(_BV(SIDETONE));
-		SIDETONE_PORT &= ~(_BV(SIDETONE));
+		//SIDETONE_DDR &= ~(_BV(SIDETONE));
+		//SIDETONE_PORT &= ~(_BV(SIDETONE));
 	}
 	sei();
 }
@@ -508,8 +508,11 @@ void init(void)
 	i2c_init();
 
 	// Delay for just a bit to let AF amp get ready before starting
-	for (uint16_t i = 0; i < 500; i++)
+	for (uint16_t i = 0; i < 1000; i++)
 		_delay_ms(1);
+
+	SIDETONE_DDR |= _BV(SIDETONE);
+	SIDETONE_PORT ^= _BV(SIDETONE);
 
 	MUTE_PORT &= ~(_BV(MUTE));
 

@@ -50,7 +50,7 @@ Inductors
 | 22u                               1      L6        
 | BN2402-43 5T                      2      L4, L5        
 | FT37-43 10T                       2      L7, L8        
-| T37-2 21T                         2      L12, L3      
+| T37-2 21T                         2      L12, L13      
 
 Transistors       
 | 2N7002                            3      Q1, Q2, Q3       
