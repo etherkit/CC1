@@ -134,7 +134,7 @@
 #define	MIN_WPM					5			// Minimum WPM setting
 #define MAX_WPM					40			// Maximum WPM setting
 #define TX_ON_DELAY				2			// TX sequence delay time (in 1 ms increments)
-#define TX_OFF_DELAY			2
+#define TX_OFF_DELAY			3
 #define MUTE_OFF_DELAY			20			// Mute off delay time (in 1 ms increments)
 #define ANNOUNCE_BUFFER_SIZE	41			// Buffer size for announce string
 #define MENU_EXPIRATION			4000		// Menu expiration time (in 1 ms increments)
@@ -269,7 +269,6 @@ ISR(TIMER1_COMPA_vect)
 	if(sidetone_on == TRUE)
 	{
 		//SIDETONE_DDR |= _BV(SIDETONE);
-		//SIDETONE_PORT ^= _BV(SIDETONE);
 
 		// PWM generator
 		st_phase_acc = st_phase_acc + st_tune_word;
@@ -280,7 +279,8 @@ ISR(TIMER1_COMPA_vect)
 	{
 		// Hi-Z the port when not using
 		//SIDETONE_DDR &= ~(_BV(SIDETONE));
-		//SIDETONE_PORT &= ~(_BV(SIDETONE));
+		//SIDETONE_PORT |= _BV(SIDETONE);
+		OCR0A = 128;
 	}
 	sei();
 }
@@ -304,13 +304,22 @@ ISR(TIMER2_COMPA_vect)
 		// Keep DDS on TX freq for a few ms after TX to allow proper envelope shaping
 		set_dds_freq_reg(REG_1);
 		if(key_down == TRUE)
+		{
+			//TX_DDR |= _BV(TX);
 			TX_PORT |= _BV(TX);
+		}
+		// Hi-Z the TX port to give proper keying shaping
 		else
+		{
+			//TX_DDR &= ~(_BV(TX));
 			TX_PORT &= ~(_BV(TX));
+			//TX_PORT |= _BV(TX);
+		}
 	}
 	else
 	{
 		set_dds_freq_reg(REG_0);
+		//TX_DDR |= _BV(TX);
 		TX_PORT &= ~(_BV(TX));
 	}
 
@@ -504,6 +513,9 @@ void init(void)
 	}
 
 	TX_PORT &= ~(_BV(TX));
+	SIDETONE_PORT |= _BV(SIDETONE);
+	MUTE_PORT &= ~(_BV(MUTE));
+
 
 	i2c_init();
 
@@ -511,10 +523,7 @@ void init(void)
 	for (uint16_t i = 0; i < 1000; i++)
 		_delay_ms(1);
 
-	SIDETONE_DDR |= _BV(SIDETONE);
-	SIDETONE_PORT ^= _BV(SIDETONE);
-
-	MUTE_PORT &= ~(_BV(MUTE));
+	power_spi_disable();
 
 	// Enable interrupts
 	sei();
@@ -1096,6 +1105,7 @@ void tx_dds(enum BOOL tx)
 
 void send_dds_word(uint16_t dds_word)
 {
+	power_spi_enable();
 	SPI_PORT |= _BV(SPI_SCK);
 	SPI_PORT &= ~(_BV(SPI_FSYNC));
 	SPDR = (uint8_t)((dds_word >> 8) & 0xFF);
@@ -1103,15 +1113,18 @@ void send_dds_word(uint16_t dds_word)
 	SPDR = (uint8_t)(dds_word & 0xFF);
 	while(!(SPSR & (1<<SPIF)));
 	SPI_PORT |= _BV(SPI_FSYNC);
+	power_spi_disable();
 }
 
 void set_dds_freq_reg(enum FREQREG reg)
 {
+	power_spi_enable();
 	// Control register
 	if(reg == REG_1)
 		send_dds_word(0x2818);
 	else
 		send_dds_word(0x2018);
+	power_spi_disable();
 }
 
 void set_st_freq(uint32_t st_freq)
