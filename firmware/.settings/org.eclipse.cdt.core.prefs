@@ -1,5 +1,15 @@
 eclipse.preferences.version=1
 environment/project/de.innot.avreclipse.configuration.app.release.1272969435=
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431.1343699220/AVRTARGETFCPU/delimiter=\:
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431.1343699220/AVRTARGETFCPU/operation=replace
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431.1343699220/AVRTARGETFCPU/value=8000000
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431.1343699220/append=true
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431.1343699220/appendContributed=true
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431/AVRTARGETFCPU/delimiter=\:
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431/AVRTARGETFCPU/operation=replace
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431/AVRTARGETFCPU/value=8000000
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431/append=true
+environment/project/de.innot.avreclipse.configuration.app.release.1272969435.558674431/appendContributed=true
 environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/delimiter=\:
 environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/operation=replace
 environment/project/de.innot.avreclipse.configuration.app.release.1272969435/AVRTARGETFCPU/value=8000000

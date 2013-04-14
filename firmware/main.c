@@ -151,13 +151,6 @@
 #define DDS_20HZ				0x1B
 #define DDS_100HZ				0x86
 
-// Band selection
-// Use this section to choose the proper band for your CC1
-// Uncomment the desired band and make sure all other bands are commented out
-
-//#define BAND_40M
-#define BAND_20M
-
 // Band constants
 // 40 Meters
 #ifdef BAND_40M
@@ -1061,7 +1054,6 @@ void poll_buttons(void)
 	prev_enc_state = cur_enc_state;
 }
 
-// TODO: Turn SPI on and off for tuning?
 void tune_dds(uint32_t dds_word, enum FREQREG reg, enum BOOL init)
 {
 	uint16_t dds_word_high, dds_word_low, freq_reg;
