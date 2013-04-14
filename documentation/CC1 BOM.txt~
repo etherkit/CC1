@@ -6,16 +6,17 @@ Etherkit
 ======================================================================================================
 Capacitors (all values pF unless specified)
 | 3.3n                              2      C16, C26       
-| 10n                               8      C37, C42, C61, C65, C71,
+| 10n                               9      C17, C37, C42, C61, C65, C71,
                                            C72, C74, C76       
-| 100n                              29     C2, C9, C12, C13, C14, C15,
-                                           C17, C18, C19, C23, C25, C30,
-                                           C31, C32, C35, C38, C43, C44, 
-                                           C45, C46, C47, C48, C49, C50,
-                                           C52, C58, C59, C60, C63       
+| 100n                              26     C2,  C12, C13, C14, C15, C18,
+                                           C19, C23, C25, C30, C31, C32, 
+                                           C35, C43, C44, C45, C46, C47,
+                                           C48, C49, C50, C52, C58, C59, 
+                                           C60, C63       
 | 100n (ceramic leaded)             1      C53       
-| 1u MLCC                           4      C5, C56, C64, C69        
-| 4.7u MLCC                         3      C11, C66, C75       
+| 1u MLCC                           7      C5, C9, C11, C38, C56, C64,
+                                           C69        
+| 4.7u MLCC                         3      C66, C75       
 | 10u electrolytic                  2      C33, C36       
 | 100u electrolytic                 3      C20, C29, C51       
 | 22                                1      C67       
@@ -49,7 +50,7 @@ Inductors
 | 22u                               1      L6        
 | BN2402-43 5T                      2      L4, L5        
 | FT37-43 10T                       2      L7, L8        
-| T37-2 21T                         2      L12, L3      
+| T37-2 21T                         2      L12, L13      
 
 Transistors       
 | 2N7002                            3      Q1, Q2, Q3       
@@ -67,13 +68,13 @@ Resistors (all resistors 0.1 watt 0805 unless specified)
 | 220                               2      R27, R59       
 | 470                               2      R14, R35       
 | 1k                                5      R20, R30, R37, R52, R53       
-| 2.2k                              6      R13, R16, R23, R31, R32, R34       
+| 2.2k                              5      R13, R16, R23, R31, R32       
 | 3.3k                              2      R11, R61       
 | 4.7k                              6      R15, R24, R47, R49, R58, R60       
 | 5k trim pot                       1      R41                              Bournes TC33X-2-502E
 | 6.8k                              3      R9, R22, R54        
 | 10k audio pot                     1      R4                               Alpha RV09AF-20-20K-A14
-| 10k                               5      R42, R43, R44, R45, R46       
+| 10k                               6      R34, R42, R43, R44, R45, R46       
 | 22k                               1      R48       
 | 33k                               2      R39, R40      
 | 47k                               3      R17, R25, R51       

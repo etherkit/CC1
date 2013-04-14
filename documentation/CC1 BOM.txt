@@ -1,6 +1,6 @@
 CC1 BOM
 Etherkit
-24 Feb 2013
+14 Apr 2013
 
 | Part (marking)                  | Qty  | Ref                            | P/N
 ======================================================================================================
@@ -87,7 +87,7 @@ Buttons and Encoders
 | Rotary encoder - Tune             1      S3                               BI EN12-VS11AF18       
 
 Transformers
-| FT37-43 20T:5T                    1      T1
+| FT37-43 20T:8T                    1      T1
 
 ICs        
 | NE5532                            1      U1                               TI NE5532DR

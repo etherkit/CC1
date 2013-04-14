@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 24 Feb 2013 06:59:34 PM PST
+EESchema Schematic File Version 2  date Sun 14 Apr 2013 09:43:51 AM PDT
 LIBS:NT7S
 LIBS:power
 LIBS:device
@@ -37,7 +37,7 @@ $Descr A 11000 8500
 encoding utf-8
 Sheet 2 3
 Title "CC1 Transceiver"
-Date "25 feb 2013"
+Date "14 apr 2013"
 Rev "A"
 Comp "Etherkit"
 Comment1 ""
@@ -417,7 +417,7 @@ L XMFR-STEPDOWN T1
 U 1 1 50DE46C6
 P 5065 2940
 F 0 "T1" H 5145 2670 50  0000 C CNN
-F 1 "FT37-43 20T:5T" H 5415 2595 50  0000 C CNN
+F 1 "FT37-43 20T:8T" H 5415 2595 50  0000 C CNN
 F 2 "" H 5065 2940 60  0001 C CNN
 F 3 "" H 5065 2940 60  0001 C CNN
 	1    5065 2940
